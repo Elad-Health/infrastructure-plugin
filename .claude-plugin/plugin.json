@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "description": "AI-powered infrastructure observability for incident investigation across Prometheus, SQL Server, and Azure DevOps",
   "author": {
-    "name": "Infrastructure Team",
+    "name": "Nof Yonany",
     "email": "[email protected]"
   },
-  "homepage": "https://github.com/company/infrastructure-plugin",
-  "repository": "https://github.com/company/infrastructure-plugin",
+  "homepage": "https://github.com/elad-nofy/infrastructure-plugin",
+  "repository": "https://github.com/elad-nofy/infrastructure-plugin",
   "license": "MIT",
   "keywords": [
     "infrastructure",
