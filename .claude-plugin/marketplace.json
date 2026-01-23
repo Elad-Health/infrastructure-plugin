@@ -1,0 +1,13 @@
+{
+  "name": "infrastructure-plugin",
+  "owner": {
+    "name": "Nof Yonany"
+  },
+  "plugins": [
+    {
+      "name": "infrastructure-plugin",
+      "source": "./",
+      "description": "AI-powered infrastructure observability for incident investigation across Prometheus, SQL Server, and Azure DevOps"
+    }
+  ]
+}
