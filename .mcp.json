@@ -1,0 +1,36 @@
+{
+  "mcpServers": {
+    "azure-devops": {
+    "command": "npx",
+    "args": ["-y", "azure-devops-mcp@latest"],
+    "env": {
+      "AZURE_DEVOPS_URL": "${AZURE_DEVOPS_URL}",
+      "AZURE_DEVOPS_PAT": "${AZURE_DEVOPS_PAT}",
+      "AZURE_DEVOPS_COLLECTION": "${AZURE_DEVOPS_COLLECTION}",
+      "AZURE_DEVOPS_PROJECT": "${AZURE_DEVOPS_PROJECT}"
+    }
+  },
+  "prometheus": {
+    "command": "npx",
+    "args": ["-y", "@elad-nofy/prometheus-mcp@latest"],
+    "env": {
+      "PROMETHEUS_URL": "${PROMETHEUS_URL}",
+      "PROMETHEUS_USERNAME": "${PROMETHEUS_USERNAME}",
+      "PROMETHEUS_PASSWORD": "${PROMETHEUS_PASSWORD}"
+    }
+  },
+  "mssql": {
+    "command": "npx",
+    "args": ["-y", "@elad-nofy/mssql-mcp@latest"],
+    "env": {
+      "MSSQL_HOST": "${MSSQL_HOST}",
+      "MSSQL_PORT": "${MSSQL_PORT}",
+      "MSSQL_USER": "${MSSQL_USER}",
+      "MSSQL_PASSWORD": "${MSSQL_PASSWORD}",
+      "MSSQL_DATABASE": "${MSSQL_DATABASE}",
+      "MSSQL_ENCRYPT": "${MSSQL_ENCRYPT}",
+      "MSSQL_TRUST_SERVER_CERTIFICATE": "${MSSQL_TRUST_SERVER_CERTIFICATE}"
+    }
+  }
+  }
+}

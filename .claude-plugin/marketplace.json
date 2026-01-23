@@ -1,0 +1,12 @@
+{
+  "name": "infrastructure-marketplace",
+  "description": "Infrastructure observability plugins for incident investigation",
+  "homepage": "https://github.com/company/infrastructure-plugin",
+  "plugins": [
+    {
+      "name": "infrastructure-plugin",
+      "description": "AI-powered infrastructure observability for incident investigation across Prometheus, SQL Server, and Azure DevOps",
+      "source": "./"
+    }
+  ]
+}

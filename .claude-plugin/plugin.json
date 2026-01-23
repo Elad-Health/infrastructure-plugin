@@ -1,0 +1,22 @@
+{
+  "name": "infrastructure-plugin",
+  "version": "1.0.0",
+  "description": "AI-powered infrastructure observability for incident investigation across Prometheus, SQL Server, and Azure DevOps",
+  "author": {
+    "name": "Infrastructure Team",
+    "email": "[email protected]"
+  },
+  "homepage": "https://github.com/company/infrastructure-plugin",
+  "repository": "https://github.com/company/infrastructure-plugin",
+  "license": "MIT",
+  "keywords": [
+    "infrastructure",
+    "aiops",
+    "incident-response",
+    "prometheus",
+    "sql-server",
+    "azure-devops",
+    "monitoring",
+    "observability"
+  ]
+}
