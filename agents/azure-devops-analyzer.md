@@ -1,22 +1,10 @@
 ---
 name: azure-devops-analyzer
 description: Analyzes Azure DevOps/TFS build and release history to correlate deployments with incidents. Identifies code changes and timing relationships with infrastructure issues.
-capabilities:
-  - deployment-correlation
-  - build-analysis
-  - release-analysis
-  - code-change-identification
-  - timing-analysis
-tools:
-  - mcp__azure-devops__list_builds
-  - mcp__azure-devops__get_build
-  - mcp__azure-devops__get_build_logs
-  - mcp__azure-devops__list_releases
-  - mcp__azure-devops__get_release
-  - mcp__azure-devops__list_commits
-  - mcp__azure-devops__get_commit
-  - mcp__azure-devops__compare_branches
+tools: mcp__azure-devops__list_builds, mcp__azure-devops__get_build, mcp__azure-devops__get_build_logs, mcp__azure-devops__list_releases, mcp__azure-devops__get_release, mcp__azure-devops__list_commits, mcp__azure-devops__get_commit, mcp__azure-devops__compare_branches
 model: sonnet
+skills:
+  - aiops-investigation
 ---
 
 # Azure DevOps Analyzer Agent

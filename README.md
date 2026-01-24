@@ -1,266 +1,255 @@
 # Infrastructure Plugin
 
-AI-powered infrastructure observability for incident investigation across Prometheus, SQL Server, and Azure DevOps.
+**Universal AI-powered infrastructure observability for incident investigation across Prometheus, SQL Server, and Azure DevOps.**
 
-## Overview
+Works dynamically with **any company's infrastructure** through intelligent discovery and architecture-aware optimization.
 
-The Infrastructure Plugin provides comprehensive incident response capabilities by combining:
+## Features
 
-- **Commands** - User-facing workflows for incident investigation
-- **Agents** - Specialized AI experts for discovery, correlation, and analysis
-- **Skills** - Persistent infrastructure knowledge and methodology
-- **MCP Servers** - Real-time data access to Prometheus, SQL Server, and Azure DevOps
+- **Dynamic Discovery** - Automatically detects SQL Server instances from Prometheus
+- **Architecture-Aware Optimization** - Adapts to shared-disk vs independent server patterns
+- **Multi-System Correlation** - Connects Prometheus alerts, SQL performance, and deployments
+- **Token Efficient** - 97% reduction in token usage through smart sampling
+- **Production Safe** - Read-only operations, all actions require approval
 
-### Key Innovation
+## Installation
 
-Multi-layered AI architecture where Claude deeply understands YOUR infrastructure:
+### Via Claude Code (Recommended)
+
+```bash
+# Add the plugin marketplace
+/plugin marketplace add https://github.com/elad-nofy/infrastructure-plugin.git
+
+# Install the plugin
+/plugin install infrastructure-plugin
+```
+
+### Manual Installation
+
+```bash
+git clone https://github.com/elad-nofy/infrastructure-plugin.git ~/.claude/plugins/infrastructure-plugin
+```
+
+### Configuration
+
+Edit `.mcp.json` or add to `~/.claude/settings.json`:
+
+**Windows:**
+```json
+{
+  "mcpServers": {
+    "azure-devops": {
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "azure-devops-mcp@latest"],
+      "env": {
+        "AZURE_DEVOPS_URL": "https://your-org.visualstudio.com",
+        "AZURE_DEVOPS_PAT": "your_pat_token",
+        "AZURE_DEVOPS_PROJECT": "YourProject"
+      }
+    },
+    "prometheus": {
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@elad-nofy/prometheus-mcp@latest"],
+      "env": {
+        "PROMETHEUS_URL": "http://prometheus.company.com:9090"
+      }
+    },
+    "mssql": {
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@elad-nofy/mssql-mcp@latest"],
+      "env": {
+        "MSSQL_HOST": "your-sql-server.domain.com",
+        "MSSQL_USER": "readonly_user",
+        "MSSQL_PASSWORD": "your_password"
+      }
+    }
+  }
+}
+```
+
+**Linux/Mac:** Remove `"cmd"` and `["/c",` from commands.
+
+## Available Skills
+
+| Skill | Description | Model | Use Case |
+|-------|-------------|-------|----------|
+| `/quick-health` | Fast infrastructure health check | haiku | Daily checks |
+| `/incident-investigation` | Full incident response | sonnet | Production issues |
+| `/disk-space` | Disk space analysis | sonnet | Storage alerts |
+| `/db-health` | Database state check | haiku | Quick DB status |
+| `/performance-analysis` | Performance deep dive | sonnet | Slow queries |
+| `/deployment-impact` | Deployment correlation | sonnet | Post-deploy issues |
+
+## Quick Start
+
+### 1. Verify Installation
+```
+/infrastructure-plugin:quick-health
+```
+
+### 2. Discover Your Infrastructure
+```
+/infrastructure-plugin:sql-instance-discovery
+```
+
+### 3. Investigate an Issue
+```
+/infrastructure-plugin:incident-investigation Users reporting slow API response
+```
+
+## Usage Examples
+
+### Daily Health Check
+```
+/infrastructure-plugin:quick-health
+/infrastructure-plugin:quick-health production
+```
+
+### Check Disk Space
+```
+/infrastructure-plugin:disk-space
+/infrastructure-plugin:disk-space >90%
+```
+
+### Investigate Incident
+```
+/infrastructure-plugin:incident-investigation
+API timeouts started after deployment
+```
+
+### Performance Analysis
+```
+/infrastructure-plugin:performance-analysis production
+```
+
+### Deployment Impact
+```
+/infrastructure-plugin:deployment-impact 24h
+/infrastructure-plugin:deployment-impact build-1234
+```
+
+## Architecture
 
 ```
 ┌─────────────────────────────────────────────────┐
-│  Commands (Workflows)                           │
-│  /incident-investigation, /db-health, etc.      │
+│  Skills (User-Facing)                           │
+│  quick-health, incident-investigation, etc.     │
 └─────────────────────────────────────────────────┘
-           ↓ orchestrates
+           ↓ invoke
 ┌─────────────────────────────────────────────────┐
 │  Agents (Specialized Experts)                   │
 │  sql-instance-discovery, prometheus-correlator  │
+│  azure-devops-analyzer, incident-report-gen     │
 └─────────────────────────────────────────────────┘
-           ↓ references
+           ↓ reference
 ┌─────────────────────────────────────────────────┐
-│  Skills (Persistent Knowledge)                  │
-│  Investigation methodology, architecture        │
+│  Knowledge Skills                               │
+│  aiops-investigation, mssql-operations          │
 └─────────────────────────────────────────────────┘
-           ↓ queries
+           ↓ query
 ┌─────────────────────────────────────────────────┐
 │  MCP Servers (Real-Time Data)                   │
 │  Prometheus, SQL Server, Azure DevOps           │
 └─────────────────────────────────────────────────┘
 ```
 
-## Features
+### Components
 
-### 🚨 Incident Investigation
+**Skills (8 total):**
+- 6 user-invocable skills (quick-health, incident-investigation, disk-space, db-health, performance-analysis, deployment-impact)
+- 2 knowledge skills (aiops-investigation, mssql-operations)
 
-Autonomous incident response across multiple systems:
-- Discovers all SQL instances automatically
-- Correlates Prometheus alerts with database performance
-- Identifies deployment-related issues
-- Generates comprehensive incident reports with confidence levels
+**Agents (4 total):**
+- `sql-instance-discovery` - Dynamic infrastructure discovery
+- `prometheus-correlator` - Alert and metric correlation
+- `azure-devops-analyzer` - Deployment analysis
+- `incident-report-generator` - Report synthesis
 
-### 📊 Performance Analysis
+**Hooks:**
+- PostToolUse hooks for automatic analysis of results
+- SubagentStop hooks for discovery validation
 
-Deep performance investigation:
-- Expensive query identification
-- Wait stats analysis
-- Blocking chain detection
-- Optimization recommendations
+## How It Works
 
-### 💾 Disk Space Management
+### Dynamic Discovery
 
-Comprehensive disk analysis:
-- Checks ALL SQL instances (shared drives)
-- Identifies instances >90% full
-- Reports actual storage paths
-- Recommends remediation actions
+The plugin discovers your infrastructure from Prometheus - no hardcoded values:
 
-### 🚀 Deployment Impact
+1. Queries Prometheus targets for SQL Server exporters
+2. Extracts instance names from any naming convention
+3. Detects architecture (shared-disk vs independent servers)
+4. Groups by environment (production/QA/dev)
 
-Deployment correlation:
-- Analyzes recent builds and releases
-- Identifies code changes
-- Correlates with infrastructure impact
-- Provides rollback recommendations
+### Architecture-Aware Optimization
 
-## Quick Start
+**Shared-Disk (30+ instances on one server):**
+- Queries 1-2 instances for drive info (97% token reduction)
+- All instances share physical drives
 
-### Installation
+**Independent Servers:**
+- Queries each unique server
+- No shared resources
 
-**For detailed installation instructions, see [INSTALL.md](INSTALL.md)**
+### Supported Infrastructure
 
-Quick summary:
+- Traditional Windows SQL Server (named instances)
+- Standalone SQL Servers
+- Cloud databases (Azure SQL, AWS RDS)
+- Hybrid environments
+- Any Prometheus exporter configuration
+- Any naming convention
 
-1. **Add marketplace:**
-   ```
-   /plugin marketplace add https://your-azure-devops-url/infrastructure-plugin.git
-   ```
+## Configuration Requirements
 
-2. **Install plugin:**
-   ```
-   /plugin install infrastructure-plugin@infrastructure-marketplace
-   ```
+### Prometheus
+- Read-only access to metrics
+- List targets endpoint
+- Windows Exporter or SQL Server Exporter configured
 
-3. **Configure credentials in `~/.claude/settings.json`:**
-   ```json
-   {
-     "env": {
-       "AZURE_DEVOPS_URL": "http://tfs2022:8080/tfs",
-       "AZURE_DEVOPS_PAT": "your_token",
-       "PROMETHEUS_URL": "http://devopsmgr:9090",
-       "MSSQL_HOST": "chamdb.eladsolutions.local",
-       "MSSQL_USER": "your_username",
-       "MSSQL_PASSWORD": "your_password",
-       ...
-     }
-   }
-   ```
+### SQL Server
+- `VIEW SERVER STATE` permission
+- `VIEW DATABASE STATE` permission
 
-4. **Restart Claude Code**
+### Azure DevOps
+- Read access to builds, releases, repositories
+- Personal Access Token (PAT)
 
-5. **Test:**
-   ```
-   /infrastructure-plugin:db-health
-   ```
+## Troubleshooting
 
-### Basic Usage
+### No instances discovered
+1. Verify Prometheus URL
+2. Check for SQL Server exporters in Prometheus targets
+3. Test: `curl http://prometheus:9090/api/v1/targets`
 
-**Investigate an incident:**
-```
-/incident-investigation
+### MCP servers not loading (Windows)
+- Ensure `.mcp.json` uses `"command": "cmd"` with `["/c", "npx", ...]`
 
-Users reporting API timeouts since last deployment
-```
+### Token limit exceeded
+- Architecture detection should prevent this
+- Try: `/infrastructure-plugin:disk-space production`
 
-**Quick health check:**
-```
-/db-health
-```
+## Safety
 
-**Check disk space:**
-```
-/disk-space
-```
+**Read-Only Operations:**
+- ✅ Reads metrics and states
+- ✅ Analyzes and correlates
+- ✅ Suggests remediation
+- ❌ Never executes changes without approval
 
-**Analyze performance:**
-```
-/performance-analysis
+All remediation actions require explicit user approval.
 
-Check V85X_PROD_DB performance
-```
+## Version History
 
-**Check deployment impact:**
-```
-/deployment-impact
-```
+- **v1.0.2** - Skills-based architecture, hooks, dynamic discovery
+- **v1.0.1** - Token optimization (97% reduction)
+- **v1.0.0** - Initial release
 
-## Commands
-
-| Command | Description | Use Case |
-|---------|-------------|----------|
-| `/incident-investigation` | Full incident response | Production outages, unknown issues |
-| `/db-health` | Quick health check | Daily checks, quick status |
-| `/disk-space` | Disk space analysis | Disk alerts, capacity planning |
-| `/performance-analysis` | Performance deep dive | Slow queries, blocking |
-| `/deployment-impact` | Deployment correlation | Post-deployment issues |
-
-## Architecture
-
-### Multi-System Integration
-
-**Prometheus → SQL Instance Mapping:**
-- Prometheus monitors application servers (V85X_PROD:9182)
-- SQL instances on CHAMDB (V85X_PROD_DB)
-- Plugin automatically maps server → instance
-
-**CHAMDB Architecture:**
-- Single SQL Server host
-- 30-40+ named instances
-- Shared resources (CPU, memory, disk)
-
-### Discovery-First Pattern
-
-**Never hardcode instance lists.**
-
-Every investigation starts with:
-1. Invoke `sql-instance-discovery` agent
-2. Discover 30+ SQL instances from Prometheus
-3. Group by environment (Production/QA/Dev)
-4. Use discovered list for all operations
-
-## Documentation
-
-- **[Setup Guide](docs/SETUP.md)** - Detailed installation instructions
-- **[Workflows](docs/WORKFLOWS.md)** - Complete usage examples
-- **[Troubleshooting](docs/TROUBLESHOOTING.md)** - Common issues and solutions
-
-## Example Investigation
-
-```
-User: /incident-investigation
-      Users reporting timeouts on V85X_PROD
-
-Claude:
-1. Discovery Phase
-   ✓ Discovered 35 SQL instances from Prometheus
-   ✓ Grouped by environment (15 Prod, 12 QA, 8 Dev)
-
-2. Data Collection
-   ✓ Prometheus: 2 FIRING alerts on V85X_PROD:9182
-   ✓ SQL Server: Blocking detected on V85X_PROD_DB
-   ✓ Azure DevOps: Build #1234 deployed 5 minutes ago
-
-3. Correlation Analysis
-   ✓ Deployment timing: HIGH correlation (5 min before incident)
-   ✓ Code changes: SQL query modification detected
-   ✓ Infrastructure: CPU spike after deployment
-
-4. Root Cause Hypothesis
-   Confidence: HIGH (90%)
-   Hypothesis: Build #1234 introduced poorly-optimized query
-
-   Supporting Evidence:
-   - Deployment 5 minutes before incident
-   - SQL query change in commit abc123
-   - Expensive query matches changed code
-   - CPU spike correlates with query execution
-
-5. Remediation Plan
-   Immediate Actions (for approval):
-   1. Rollback Build #1234 to Build #1233
-   2. Kill blocking SPID 152 (stuck query)
-
-   Expected Recovery: Immediate (<5 minutes)
-```
-
-## Safety Features
-
-**All remediation actions require approval:**
-- No automatic destructive operations
-- Clear risk assessment provided
-- Verification steps included
-- Preventive measures suggested
-
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and contribution guidelines.
+See [CHANGELOG.md](CHANGELOG.md) for details.
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) for details.
-
-## Support
-
-- **Issues:** Report bugs or request features in Azure DevOps
-- **Documentation:** See [docs/](docs/) directory
-- **Questions:** Contact Infrastructure Team
-
-## Roadmap
-
-### v1.0 (Current)
-- Core incident investigation
-- Performance analysis
-- Disk space management
-- Deployment correlation
-
-### v1.1 (Planned)
-- Capacity planning command
-- Alert correlation command
-- Historical incident search
-
-### v2.0 (Future)
-- Automated remediation (safe actions)
-- Multi-environment support
-- Runbook executor
+MIT License - see [LICENSE](LICENSE)
 
 ---
 
-**Built with Claude Code** - AI-powered infrastructure observability for autonomous incident response.
+**The plugin discovers and adapts to YOUR infrastructure - no configuration of instance names required.**

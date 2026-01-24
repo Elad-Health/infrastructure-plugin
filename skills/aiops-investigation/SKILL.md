@@ -18,7 +18,8 @@ You are investigating production infrastructure incidents using AI-powered analy
 **Actions:**
 1. **Discover Infrastructure**
    - Invoke `sql-instance-discovery` agent
-   - Validate discovery (expect 30+ SQL instances)
+   - Validate discovery results
+   - Detect architecture pattern (shared-disk vs independent servers)
    - Map application servers to SQL instances
 
 2. **Establish Timeline**
@@ -135,22 +136,25 @@ When analyzing `get_disk_space()` results:
 - tempdb: Often on T: drive but verify
 
 **Report ACTUAL paths from data:**
-- Good: "Chameleon database data file is on D:\V85X_QA_DB\Data\Chameleon.mdf (65 GB)"
+- Good: "Database data file is on D:\Instance\Data\MyDatabase.mdf (65 GB)"
 - Bad: "All instances use D: for data files" (inaccurate generalization)
 
 ## Application Server ↔ SQL Instance Correlation
 
-**Critical Pattern:** Prometheus monitors application servers, SQL instances are on CHAMDB.
+**Critical Pattern:** Prometheus monitors application servers, SQL instances discovered dynamically.
 
-**Mapping Convention:**
-- Application server: `V85X_PROD` (monitored by windows_exporter on port 9182)
-- SQL instance: `V85X_PROD_DB` (on chamdb.eladsolutions.local)
+**Correlation Flow:**
+1. Prometheus alert on application server (e.g., `hostname:9182`)
+2. Extract server identifier from alert
+3. Map to SQL instance using discovery results
+4. Check corresponding SQL instance for database issues
 
 **Example Correlation:**
-1. Prometheus alert: `CPUUsageHigh` on `V85X_PROD:9182`
-2. Check SQL instance: `V85X_PROD_DB` for expensive queries
-3. If expensive query found: Application load is causing database load
-4. Root cause: Application behavior triggering database bottleneck
+1. Prometheus alert: `CPUUsageHigh` on `appserver-prod:9182`
+2. Discovery shows SQL instance: `SQLHOST\PROD_DB` serves this application
+3. Check `PROD_DB` for expensive queries
+4. If expensive query found: Application load is causing database load
+5. Root cause: Application behavior triggering database bottleneck
 
 This correlation is KEY to incident investigation.
 
@@ -193,9 +197,14 @@ This correlation is KEY to incident investigation.
 5. **Confidence levels matter** - Be honest about confidence, mention alternatives
 6. **Safety first** - All remediation actions require approval, never auto-execute
 
-## References
+## Architecture-Aware Investigation
 
-See `references/` directory for detailed patterns:
-- `sql-discovery-pattern.md` - Discovery implementation details
-- `correlation-techniques.md` - Multi-system correlation methods
-- `infrastructure-architecture.md` - CHAMDB architecture and conventions
+**Shared-Disk Multi-Instance Architecture:**
+- Multiple instances share physical drives
+- Disk space issues affect all instances
+- Use smart sampling for disk queries (1-2 instances for drive info)
+
+**Independent Server Architecture:**
+- Each server has independent resources
+- Query each server for complete picture
+- No shared-resource concerns

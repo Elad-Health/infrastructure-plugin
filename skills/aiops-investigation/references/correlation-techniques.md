@@ -1,238 +1,249 @@
 # Multi-System Correlation Techniques
 
-## Overview
+Methods for correlating findings across Prometheus, SQL Server, and Azure DevOps.
 
-Effective incident investigation requires correlating evidence from three independent systems:
-1. **Prometheus** - Infrastructure monitoring (alerts, metrics)
-2. **SQL Server** - Database performance (queries, blocking, disk)
-3. **Azure DevOps** - Deployment history (builds, releases, code changes)
+## Temporal Correlation
 
-## Correlation Patterns
+### Timeline Construction
 
-### Pattern 1: Deployment-Triggered Incident
+Build a unified timeline from all data sources:
 
-**Timeline:**
-- T-0: Deployment completes (Azure DevOps)
-- T+5min: Infrastructure alert fires (Prometheus)
-- T+8min: Database issues detected (SQL Server)
-- T+10min: User complaints begin
+```
+Time        | Source       | Event
+------------|--------------|----------------------------------
+08:55       | Azure DevOps | Build #1234 started
+09:00       | Azure DevOps | Build #1234 completed (deployed)
+09:03       | Prometheus   | CPUUsageHigh alert fired
+09:05       | SQL Server   | Expensive query detected
+09:08       | User Report  | "API is slow"
+09:10       | Prometheus   | MemoryUsageHigh alert fired
+09:15       | SQL Server   | Blocking detected (15 sessions)
+```
 
-**Correlation Logic:**
-1. Deployment timing is close to incident start (5-30 minutes)
-2. Code changes in deployment are relevant to symptoms
-3. Affected systems match deployment target
+### Correlation Windows
 
-**Confidence:** High (if all three align)
+| Gap | Correlation | Interpretation |
+|-----|-------------|----------------|
+| 0-5 min | Very High | Direct causation likely |
+| 5-15 min | High | Strong relationship |
+| 15-30 min | Medium | Possible relationship |
+| 30-60 min | Low | Weak relationship |
+| >60 min | Very Low | Probably unrelated |
+
+## Application-to-Database Mapping
+
+### Prometheus → SQL Instance Correlation
+
+**Pattern 1: Hostname Matching**
+```
+Prometheus target: app-server-01:9182
+SQL Instance: SQLSERVER01\APP_DB
+
+Correlation: app-server-01 connects to APP_DB
+```
+
+**Pattern 2: Label Matching**
+```
+Prometheus labels: {app="orders", env="prod"}
+SQL Instance: ORDERS_PROD_DB
+
+Correlation: Match by application name
+```
+
+**Pattern 3: Discovery Mapping**
+```
+Discovery shows:
+- V85X_PROD (app server) → V85X_PROD_DB (SQL instance)
+
+When alert fires on V85X_PROD:9182
+→ Check V85X_PROD_DB for SQL issues
+```
+
+### Correlation Query Pattern
+
+```
+1. Alert on app server: "CPUUsageHigh" on "app-prod-01"
+2. Extract identifier: "app-prod-01" or "app" or "prod"
+3. Match to SQL instance from discovery
+4. Query SQL instance for performance issues
+5. Correlate timing
+```
+
+## Deployment Impact Correlation
+
+### Build/Release to Alert Correlation
+
+```
+Build Completed: 09:00 (project: OrderService)
+Alert Fired: 09:05 (target: orders-prod:9182)
+
+Correlation Check:
+- Same project/application? ✓
+- Within correlation window? ✓ (5 min)
+- Affected instance serves this app? ✓
+
+Result: HIGH correlation
+```
+
+### Code Change Analysis
+
+```
+1. Get commits in build
+   → mcp__azure-devops__list_commits(build_id)
+
+2. Categorize changes:
+   - SQL queries changed? → Check expensive queries
+   - Data access patterns changed? → Check blocking
+   - Configuration changed? → Check all metrics
+
+3. Match to symptoms:
+   - New query text matches expensive query?
+   - Changed table matches blocking resource?
+```
+
+## Alert Storm Analysis
+
+### Pattern Recognition
+
+**Cascading Failure:**
+```
+Alert 1: DiskSpaceLow (09:00)
+Alert 2: TransactionLogFull (09:05)
+Alert 3: DatabaseOffline (09:10)
+Alert 4: ApplicationTimeout (09:12)
+
+Root Cause: Alert 1 (disk space)
+Others are cascading effects
+```
+
+**Simultaneous Alerts:**
+```
+Alert 1: CPUHigh on server-01 (09:00)
+Alert 2: CPUHigh on server-02 (09:00)
+Alert 3: CPUHigh on server-03 (09:00)
+
+Pattern: Infrastructure-wide issue
+Check: Shared resource (host, storage, network)
+```
+
+### Alert Grouping Strategy
+
+1. **Group by time:** Alerts within 5 minutes
+2. **Group by target:** Same server/instance
+3. **Group by type:** Similar alert names
+4. **Identify primary:** First alert or root cause
+
+## Cross-System Evidence Correlation
+
+### Evidence Strength Levels
+
+| Evidence Type | Strength | Example |
+|---------------|----------|---------|
+| Direct match | Very Strong | Query text in build matches expensive query |
+| Timing correlation | Strong | Alert 3 min after deployment |
+| Type correlation | Medium | CPU alert + CPU-heavy query found |
+| Circumstantial | Weak | Deployment same day as incident |
+
+### Building a Hypothesis
+
+**Minimum for High Confidence:**
+- At least 3 independent pieces of evidence
+- At least 1 "Very Strong" or 2 "Strong" evidence
+- No contradicting evidence
 
 **Example:**
 ```
-14:25 - Build #1234 deployed to V85X_PROD
-14:30 - CPUUsageHigh alert on V85X_PROD:9182
-14:32 - Expensive query detected on V85X_PROD_DB
-14:33 - Users report timeouts
+Evidence 1 (Very Strong): Build #1234 changed OrderQuery.cs
+Evidence 2 (Strong): Alert fired 5 min after deployment
+Evidence 3 (Strong): Expensive query matches OrderQuery code
+Evidence 4 (Medium): Affected server runs Orders service
 
-Root Cause: Deployment introduced poorly optimized query
-Confidence: High (90%)
+Confidence: HIGH (4 pieces, including 1 very strong, 2 strong)
 ```
 
-### Pattern 2: Cascading Failure
+## Prometheus Metric Correlation
 
-**Timeline:**
-- T-0: Primary failure occurs
-- T+2min: Secondary failure (downstream dependency)
-- T+5min: Tertiary failure (further downstream)
-
-**Correlation Logic:**
-1. Failures happen in sequence, not simultaneously
-2. Later failures are caused by earlier failures
-3. Dependency relationships explain propagation
-
-**Example:**
+### CPU Correlation
 ```
-14:00 - Disk full on V87X_QA (SQL Server)
-14:02 - Transaction log cannot grow, queries start failing
-14:05 - Application server V87X_QA shows errors
-14:08 - Prometheus DiskSpaceAlert fires
-14:10 - Blocking detected on V87X_QA_DB (queries waiting for log writes)
-
-Root Cause: Disk space exhaustion caused cascading failures
-Confidence: High (85%)
+High CPU on app server
+→ Check: mcp__mssql__get_expensive_queries(metric="cpu")
+→ Match: Query consuming most CPU to app behavior
 ```
 
-### Pattern 3: Resource Exhaustion
-
-**Timeline:**
-- Gradual degradation over hours/days
-- Threshold crossed triggering alerts
-- No specific triggering event
-
-**Correlation Logic:**
-1. Metrics show gradual increase (not sudden spike)
-2. No deployment or external event at failure time
-3. Capacity-related (disk, memory, CPU trending up)
-
-**Example:**
+### Memory Correlation
 ```
-Jan 20 - Transaction log at 60% (SQL Server)
-Jan 21 - Transaction log at 75%
-Jan 22 - Transaction log at 85%
-Jan 23 14:00 - Transaction log hits 95%, alert fires
-Jan 23 14:05 - Queries start failing
-
-Root Cause: Long-running transaction preventing log truncation
-Confidence: Medium (70%) - need to find specific transaction
+High memory on app server
+→ Check: mcp__mssql__get_wait_stats() for RESOURCE_SEMAPHORE
+→ Match: Memory-intensive queries to app operations
 ```
 
-### Pattern 4: External Factor
-
-**Timeline:**
-- Incident occurs without internal changes
-- External system or event is the cause
-
-**Correlation Logic:**
-1. No recent deployments in Azure DevOps
-2. Prometheus shows external metrics anomalies
-3. SQL Server shows symptoms but no internal cause
-
-**Example:**
+### Disk Correlation
 ```
-14:00 - Network latency spike (Prometheus)
-14:02 - SQL Server connections increase dramatically
-14:05 - Connection pool exhaustion on V85X_PROD
-14:08 - Users report timeouts
-
-Root Cause: External API slowdown caused connection buildup
-Confidence: Medium (65%) - would need external system data to confirm
+High disk I/O on server
+→ Check: mcp__mssql__get_wait_stats() for PAGEIOLATCH_*
+→ Check: mcp__mssql__get_disk_space() for capacity
 ```
 
-## Correlation Techniques
+## Multi-Instance Correlation
 
-### Technique 1: Timeline Alignment
+### Shared-Disk Architecture
 
-Create unified timeline with all events:
+When multiple instances share physical resources:
 
-| Time | System | Event | Details |
-|------|--------|-------|---------|
-| 14:25 | Azure DevOps | Build #1234 deployed | V85X_PROD |
-| 14:28 | Prometheus | Alert: CPUUsageHigh | V85X_PROD:9182 |
-| 14:30 | Users | Complaints | Timeouts |
-| 14:32 | SQL Server | Blocking detected | SPID 152 |
-| 14:35 | Prometheus | Alert: MemoryUsageHigh | V85X_PROD:9182 |
+```
+Instance A: High CPU query
+Instance B: Slow performance (no obvious cause)
+Instance C: Slow performance (no obvious cause)
 
-**Analysis:** Deployment at 14:25 is 5 minutes before first alert. Strong temporal correlation.
+Correlation: A is "noisy neighbor" affecting B and C
+Solution: Address A's query to fix all
+```
 
-### Technique 2: System Mapping
+### Independent Server Analysis
 
-Map related entities across systems:
+When instances are independent:
 
-| Prometheus | SQL Server | Azure DevOps | Environment |
-|------------|------------|--------------|-------------|
-| V85X_PROD:9182 | V85X_PROD_DB | V85X_PROD project | Production |
-| V87X_QA:9182 | V87X_QA_DB | V87X_QA project | QA |
+```
+Instance A: Issue
+Instance B: No issue
+Instance C: No issue
 
-**Analysis:** If V85X_PROD:9182 has alert, check V85X_PROD_DB for SQL issues and V85X_PROD builds.
+Correlation: Problem is specific to A
+Analysis: Focus on A only
+```
 
-### Technique 3: Change Detection
+## Report Integration Points
 
-Identify what changed recently:
+### Linking Findings in Report
 
-**Azure DevOps Changes:**
-- Builds in last 24h
-- Releases in last 24h
-- Code commits with risk factors (SQL changes, config changes)
+```markdown
+### Root Cause Analysis
 
-**SQL Server Changes:**
-- Schema changes (new indexes, tables)
-- Query plan changes
-- Configuration changes
+**Primary Finding:**
+SQL Server query causing high CPU
 
-**Prometheus Changes:**
-- New alerts firing
-- Metrics crossing thresholds
-- Target health changes
+**Correlated Evidence:**
+1. Prometheus alert: CPUUsageHigh on app-server-01 at 09:05
+2. Azure DevOps: Build #1234 deployed OrderService at 09:00
+3. SQL Server: Query in OrderService using 85% CPU since 09:03
 
-### Technique 4: Impact Analysis
+**Correlation Timeline:**
+09:00 → 09:03 → 09:05
+Deploy → Query starts → Alert fires
 
-Determine scope of impact:
+**Confidence:** HIGH (95%)
+- Timing alignment: ✓ (3 min, 5 min)
+- Code correlation: ✓ (Query matches changed code)
+- Impact correlation: ✓ (Affected server runs deployed service)
+```
 
-**Affected SQL Instances:**
-- From SQL Server: Which instances have issues?
-- From Prometheus: Which application servers alerted?
-- From Azure DevOps: Which projects deployed?
+## Quick Reference: What to Correlate
 
-**Cross-reference:**
-- Does deployment scope match affected instances?
-- Are unrelated instances also affected? (suggests broader issue)
-
-### Technique 5: Evidence Triangulation
-
-Use multiple independent signals to confirm hypothesis:
-
-**Example: Confirming Deployment Cause**
-
-**Signal 1 (Timing):** Deployment 5 minutes before incident
-**Signal 2 (Code):** Deployment includes SQL query change
-**Signal 3 (Symptom):** Expensive query matches changed query
-**Signal 4 (Scope):** Only deployed instance affected
-
-**Conclusion:** High confidence (4 independent signals align)
-
-## Confidence Calibration
-
-### High Confidence (>80%)
-
-Requires:
-- 3+ independent signals pointing to same cause
-- Clear mechanism explaining symptoms
-- No contradictory evidence
-- Timing correlation <30 minutes
-
-### Medium Confidence (50-80%)
-
-Characteristics:
-- 2 signals align, others weak or absent
-- Mechanism plausible but not certain
-- Some contradictory evidence exists
-- Timing correlation 30-120 minutes
-
-### Low Confidence (<50%)
-
-Characteristics:
-- Only 1 weak signal
-- Multiple plausible causes
-- Significant contradictory evidence
-- No clear timing correlation
-
-## Common Pitfalls
-
-### Pitfall 1: Correlation vs Causation
-
-**Mistake:** Deployment happened before incident → deployment caused incident
-
-**Reality:** Need mechanism, not just timing
-
-**Fix:** Ask "HOW would this deployment cause these symptoms?"
-
-### Pitfall 2: Confirmation Bias
-
-**Mistake:** Find deployment, stop looking for other causes
-
-**Reality:** Recent deployment is attractive but may be coincidence
-
-**Fix:** Actively look for contradictory evidence
-
-### Pitfall 3: Ignoring Negative Evidence
-
-**Mistake:** Focus only on data that supports hypothesis
-
-**Reality:** Contradictory data is valuable
-
-**Fix:** Lower confidence when contradictory evidence exists
-
-### Pitfall 4: Over-Generalizing
-
-**Mistake:** "All instances are affected" when only checked one
-
-**Reality:** Need to validate scope with multiple instances
-
-**Fix:** Check multiple instances before making scope claims
+| If You Find | Correlate With | Looking For |
+|-------------|----------------|-------------|
+| CPU alert | Expensive queries | Query causing CPU |
+| Memory alert | Wait stats, queries | Memory-hungry queries |
+| Disk alert | Disk space, blocking | Space issue, long transaction |
+| SQL blocking | Recent deployments | New problematic code |
+| Expensive query | Deployment timeline | When query was deployed |
+| Failed build | Subsequent alerts | Build causing issues |

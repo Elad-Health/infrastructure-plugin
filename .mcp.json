@@ -1,8 +1,8 @@
 {
   "mcpServers": {
     "azure-devops": {
-    "command": "npx",
-    "args": ["-y", "azure-devops-mcp@latest"],
+    "command": "cmd",
+    "args": ["/c", "npx", "-y", "azure-devops-mcp@latest"],
     "env": {
       "AZURE_DEVOPS_URL": "${AZURE_DEVOPS_URL}",
       "AZURE_DEVOPS_PAT": "${AZURE_DEVOPS_PAT}",
@@ -11,8 +11,8 @@
     }
   },
   "prometheus": {
-    "command": "npx",
-    "args": ["-y", "@elad-nofy/prometheus-mcp@latest"],
+    "command": "cmd",
+    "args": ["/c", "npx", "-y", "@elad-nofy/prometheus-mcp@latest"],
     "env": {
       "PROMETHEUS_URL": "${PROMETHEUS_URL}",
       "PROMETHEUS_USERNAME": "${PROMETHEUS_USERNAME}",
@@ -20,8 +20,8 @@
     }
   },
   "mssql": {
-    "command": "npx",
-    "args": ["-y", "@elad-nofy/mssql-mcp@latest"],
+    "command": "cmd",
+    "args": ["/c", "npx", "-y", "@elad-nofy/mssql-mcp@latest"],
     "env": {
       "MSSQL_HOST": "${MSSQL_HOST}",
       "MSSQL_PORT": "${MSSQL_PORT}",

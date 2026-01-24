@@ -1,10 +1,11 @@
 {
   "name": "infrastructure-plugin",
-  "version": "1.0.0",
-  "description": "AI-powered infrastructure observability for incident investigation across Prometheus, SQL Server, and Azure DevOps",
+  "version": "1.0.4",
+  "description": "AI-powered infrastructure observability for incident investigation across Prometheus, SQL Server, and Azure DevOps. Works with any company's infrastructure through dynamic discovery.",
   "author": {
     "name": "Nof Yonany",
-    "email": "[email protected]"
+    "email": "[email protected]",
+    "url": "https://github.com/elad-nofy"
   },
   "homepage": "https://github.com/elad-nofy/infrastructure-plugin",
   "repository": "https://github.com/elad-nofy/infrastructure-plugin",
@@ -17,6 +18,9 @@
     "sql-server",
     "azure-devops",
     "monitoring",
-    "observability"
-  ]
+    "observability",
+    "mcp"
+  ],
+  "hooks": "./hooks/hooks.json",
+  "mcpServers": "./.mcp.json"
 }

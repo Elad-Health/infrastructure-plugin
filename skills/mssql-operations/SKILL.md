@@ -1,56 +1,55 @@
 ---
 name: mssql-operations
-description: SQL Server operations knowledge for CHAMDB architecture with 30+ named instances. Provides instance discovery patterns, naming conventions, and operational best practices.
+description: SQL Server operations knowledge for multi-instance environments. Provides instance discovery patterns, naming conventions, and operational best practices. Works with any SQL Server infrastructure.
 user-invocable: false
 model: inherit
 ---
 
 # MSSQL Operations Skill
 
-You have deep knowledge of SQL Server operations in a multi-instance environment, specifically the CHAMDB architecture with 30+ named SQL Server instances.
+You have deep knowledge of SQL Server operations in multi-instance environments, adaptable to any SQL Server infrastructure architecture.
 
-## CHAMDB Architecture
+## Infrastructure Architecture Patterns
 
-### Single Host, Multiple Named Instances
+### Pattern 1: Single Host, Multiple Named Instances
 
-**Host:** chamdb.eladsolutions.local
-
-**Architecture:**
+**Characteristics:**
 - Single physical/virtual SQL Server host
-- 30-40+ named SQL Server instances on this host
-- Each instance serves a different application/environment
+- Multiple named SQL Server instances on the host
+- Each instance serves different application/environment
 - Shared physical resources (CPU, memory, disk)
 
-### Instance Naming Convention
+**Connection Format:**
+```
+Server: hostname\INSTANCE_NAME
+Example: sqlserver01\PROD_DB
+```
 
-**Pattern:** `{APPLICATION}_{ENVIRONMENT}_DB`
+### Pattern 2: Multiple Independent Servers
 
-**Examples:**
-- V85X_PROD_DB - Version 85X Production
-- V87X_PROD_DB - Version 87X Production
-- V85X_PROD2_DB - Version 85X Production (secondary)
-- V87X_QA_DB - Version 87X QA/Test
-- V91X_DEV_DB - Version 91X Development
-- SOLUTIONSDB_DB - Solutions Database
+**Characteristics:**
+- Separate SQL Servers for different environments
+- Independent resources per server
+- May be physical, virtual, or cloud
 
-### Environment Identification
+**Connection Format:**
+```
+Server: sql-prod.company.com
+Server: sql-qa.company.com
+```
 
-**Production Instances:**
-- Contains "_PROD_" in name
-- Contains "_PROD2_" in name (secondary production)
-- Examples: V85X_PROD_DB, V87X_PROD2_DB
+### Pattern 3: Cloud Managed (Azure SQL, RDS)
 
-**QA/Test Instances:**
-- Contains "_QA_" in name
-- Examples: V87X_QA_DB, V91X_QA_DB, V92X_QA_DB
+**Characteristics:**
+- Managed database services
+- Individual databases, not instances
+- Cloud-specific monitoring
 
-**Development Instances:**
-- Contains "_DEV_" in name
-- Examples: V85X_DEV_DB, V87X_DEV_DB, V91X_DEV_DB
-
-**Other Instances:**
-- Doesn't fit above patterns
-- Examples: SOLUTIONSDB_DB, V10X_DEMO_DB
+**Connection Format:**
+```
+Server: yourserver.database.windows.net
+Server: yourserver.us-east-1.rds.amazonaws.com
+```
 
 ## Discovery-First Pattern
 
@@ -58,13 +57,13 @@ You have deep knowledge of SQL Server operations in a multi-instance environment
 
 **Wrong Approach:**
 ```python
-instances = ["V85X_PROD_DB", "V87X_PROD_DB", ...]  # Hardcoded
+instances = ["PROD_DB", "QA_DB", ...]  # Hardcoded - BAD
 ```
 
 **Right Approach:**
 ```python
-# Discover from Prometheus
-instances = discover_instances_from_prometheus()
+# Discover from Prometheus dynamically
+instances = discover_instances_from_prometheus()  # GOOD
 ```
 
 ### Discovery Protocol
@@ -74,73 +73,82 @@ instances = discover_instances_from_prometheus()
 Before ANY SQL Server operations:
 1. Invoke the `sql-instance-discovery` agent
 2. Wait for complete discovered list
-3. Validate discovery (30+ instances expected)
+3. Validate discovery results
 4. Use discovered list for subsequent operations
 
 **Step 2: Group by environment**
 
 From discovered list:
 - Separate Production vs QA vs Dev
-- Prioritize based on incident scope
+- Use environment labels from Prometheus when available
+- Fall back to name parsing if no labels
 
-**Step 3: Target relevant instances**
+**Step 3: Detect architecture pattern**
 
-- If incident specifies system (e.g., "V85X_PROD slow"), check that instance
-- If disk space issue, check ALL instances (shared disk)
-- If performance issue, check Production instances first, then others
+From discovered hostnames:
+- Multiple instances on same hostname → Shared-disk architecture
+- Different hostnames → Independent servers
+- Apply appropriate optimization strategy
+
+## Environment Identification
+
+### Common Naming Patterns
+
+**Production Indicators:**
+- Contains: `prod`, `production`, `prd`, `live`, `p01`
+- Examples: `PROD_DB`, `sql-production`, `app-prd-01`
+
+**QA/Test Indicators:**
+- Contains: `qa`, `test`, `tst`, `uat`, `q01`
+- Examples: `QA_DB`, `test-sql`, `app-uat-01`
+
+**Development Indicators:**
+- Contains: `dev`, `development`, `devel`, `d01`
+- Examples: `DEV_DB`, `sql-dev`, `app-d01`
+
+**Staging Indicators:**
+- Contains: `stage`, `staging`, `stg`, `s01`
+- Examples: `STAGING_DB`, `sql-stage`
+
+**Case-insensitive matching** - works with any naming convention.
 
 ## SQL Server Operations
 
-### Connection Format
-
-**Named Instance:**
-```
-Server: chamdb.eladsolutions.local\V85X_PROD_DB
-Authentication: Windows or SQL Auth
-```
-
-**MCP Server Default:**
-```
-MSSQL_HOST=chamdb.eladsolutions.local
-# Then specify instance in server parameter: "chamdb.eladsolutions.local\V85X_PROD_DB"
-```
-
-### Common Operations
+### Common MCP Operations
 
 **Health Check:**
 ```
-mcp__mssql__get_database_states(server="chamdb\\V85X_PROD_DB")
+mcp__mssql__get_database_states(server="{discovered_instance}")
 ```
 
 **Blocking Detection:**
 ```
-mcp__mssql__get_blocking(server="chamdb\\V85X_PROD_DB")
+mcp__mssql__get_blocking(server="{discovered_instance}")
 ```
 
 **Expensive Queries:**
 ```
-mcp__mssql__get_expensive_queries(server="chamdb\\V85X_PROD_DB", top=10, metric="cpu")
+mcp__mssql__get_expensive_queries(server="{discovered_instance}", top=10, metric="cpu")
 ```
 
 **Disk Space:**
 ```
-mcp__mssql__get_disk_space(server="chamdb\\V85X_PROD_DB")
+mcp__mssql__get_disk_space(server="{discovered_instance}")
 ```
 
 **Wait Stats:**
 ```
-mcp__mssql__get_wait_stats(server="chamdb\\V85X_PROD_DB", top=10)
+mcp__mssql__get_wait_stats(server="{discovered_instance}", top=10)
 ```
 
 **Failed Jobs:**
 ```
-mcp__mssql__get_failed_jobs(server="chamdb\\V85X_PROD_DB", hours=24)
+mcp__mssql__get_failed_jobs(server="{discovered_instance}", hours=24)
 ```
 
-### Resource Sharing Implications
+### Resource Sharing Implications (Shared-Disk Architecture)
 
-**Shared Resources:**
-- All 30+ instances share same physical host
+**When multiple instances share a host:**
 - CPU cores shared across all instances
 - Memory shared (with instance max settings)
 - Disk I/O bandwidth shared
@@ -156,6 +164,18 @@ mcp__mssql__get_failed_jobs(server="chamdb\\V85X_PROD_DB", hours=24)
 - Disk space issues: Check ALL instances (shared drives)
 - Performance issues: Check if other instances also affected
 
+### Independent Server Considerations
+
+**When instances are on separate servers:**
+- Each server has independent resources
+- Disk space is per-server
+- Performance issues are isolated
+
+**Monitoring Strategy:**
+- Query each server separately
+- No shared-resource concerns
+- Can investigate in parallel
+
 ## Storage Paths
 
 ### Never Assume Uniform Paths
@@ -168,16 +188,10 @@ mcp__mssql__get_failed_jobs(server="chamdb\\V85X_PROD_DB", hours=24)
 - L: drive - Transaction log files (.ldf)
 - T: drive - tempdb files
 
-**Per-Instance Subdirectories:**
-```
-D:\V85X_PROD_DB\Data\MyDatabase.mdf
-D:\V85X_PROD_DB\Logs\MyDatabase_log.ldf
-```
-
 **When Reporting Disk Space:**
-- Read actual file_path from `get_disk_space()` results
+- Read actual `file_path` from `get_disk_space()` results
 - Report specific paths, not assumptions
-- Good: "Chameleon database is on D:\V85X_QA_DB\Data\Chameleon.mdf (65 GB)"
+- Good: "Database is on D:\Instance\Data\MyDB.mdf (65 GB)"
 - Bad: "All databases are on D:" (unverified generalization)
 
 ## Error Handling
@@ -193,7 +207,7 @@ D:\V85X_PROD_DB\Logs\MyDatabase_log.ldf
 
 **Handling:**
 ```
-Try to connect to instance V85X_PROD_DB...
+Try to connect to instance...
 Error: Cannot connect
 
 Actions:
@@ -226,12 +240,15 @@ Every command/investigation MUST start with:
 Invoke sql-instance-discovery agent → Get complete list → Proceed with operations
 ```
 
-### 2. Check Multiple Instances
+### 2. Architecture-Aware Operations
 
-Don't assume one instance status applies to all:
-- Disk space: Check ALL (shared resource)
-- Performance: Check multiple to identify scope
-- Deployment: Check relevant instances based on deployment target
+**Shared-Disk Architecture:**
+- Disk space: Query 1-2 instances for drive info (shared drives return same info)
+- Performance: Check if issue affects multiple instances
+
+**Independent Servers:**
+- Disk space: Query each server
+- Performance: Check affected servers only
 
 ### 3. Verify From Data
 
@@ -243,12 +260,16 @@ Don't assume:
 
 Always verify from actual MCP tool results.
 
-### 4. Parallel Operations Where Possible
+### 4. Token-Efficient Operations
 
-If checking 30+ instances for disk space:
-- Can run queries in parallel
-- Aggregate results
-- Report summary + details
+**Shared-Disk (30+ instances):**
+- Smart sampling for disk space (97% token reduction)
+- Query 1-2 instances for drive-level info
+- Only drill down if critical issue found
+
+**Independent Servers:**
+- Query each unique server
+- No sampling benefit
 
 ### 5. Clear Error Reporting
 
@@ -263,23 +284,22 @@ If operation fails:
 ### Mapping Pattern
 
 **Prometheus monitors application servers:**
-- V85X_PROD:9182 (windows_exporter)
-- Hostname: V85X_PROD
+- `hostname:9182` (windows_exporter)
 
-**SQL instances on CHAMDB:**
-- V85X_PROD_DB (named instance)
+**SQL instances discovered:**
+- `hostname\INSTANCE_NAME` or `hostname`
 
 **Correlation:**
-- High CPU on V85X_PROD application server
-- → Check V85X_PROD_DB SQL instance for expensive queries
+- High CPU on application server
+- → Check corresponding SQL instance for expensive queries
 - → Likely database queries causing application server load
 
 ### Incident Investigation Flow
 
-1. Prometheus alert: CPUUsageHigh on V85X_PROD:9182
-2. Extract hostname: V85X_PROD
-3. Map to SQL instance: V85X_PROD_DB
-4. Check expensive queries on V85X_PROD_DB
+1. Prometheus alert on application server
+2. Extract server identifier
+3. Map to SQL instance (from discovery)
+4. Check expensive queries on SQL instance
 5. Identify problematic query
 6. Correlate with recent deployment (Azure DevOps)
 
@@ -294,12 +314,12 @@ If operation fails:
 
 **Investigation:**
 1. Discover all instances
-2. Check disk space on ALL instances (shared drives)
+2. Check disk space (architecture-aware)
 3. Identify which database(s) large
 4. Check transaction log sizes (often culprit)
 5. Check for long-running transactions preventing log truncation
 
-**Remediation:**
+**Remediation (recommend to user):**
 - Free up space (delete old backups, compress files)
 - Shrink transaction log (if safe - after log backup)
 - Kill long-running transaction (if blocking log truncation)
@@ -317,7 +337,7 @@ If operation fails:
 3. Check what head blocker is doing (query text)
 4. Determine if blocker is legitimate (long operation) or stuck
 
-**Remediation:**
+**Remediation (recommend to user):**
 - Kill head blocker session (if stuck/orphaned)
 - Optimize blocking query (if legitimate but slow)
 - Application code change (better transaction management)
@@ -335,7 +355,7 @@ If operation fails:
 3. Identify SQL code changes in deployment
 4. Match expensive query to changed code
 
-**Remediation:**
+**Remediation (recommend to user):**
 - Rollback deployment
 - Optimize query
 - Add index
@@ -371,12 +391,12 @@ Some operations on heavily-loaded instances may timeout:
 
 Set appropriate timeouts (30-60 seconds).
 
-### Parallel Operations
+### Token Budget
 
-When checking 30+ instances:
-- Parallel queries can reduce total time
-- But: May overload CHAMDB if too aggressive
-- Recommend: 5-10 concurrent queries max
+When checking many instances:
+- Use architecture-aware sampling
+- Don't query all 30+ instances for disk space if shared-disk
+- Progressive investigation: lightweight first, detailed where needed
 
 ### Caching
 

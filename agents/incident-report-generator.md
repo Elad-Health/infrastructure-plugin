@@ -1,14 +1,10 @@
 ---
 name: incident-report-generator
 description: Synthesizes findings from Prometheus, SQL Server, and Azure DevOps to generate comprehensive incident reports with root cause hypothesis and confidence scoring.
-capabilities:
-  - multi-system-synthesis
-  - root-cause-analysis
-  - confidence-scoring
-  - report-generation
-  - remediation-planning
-tools: []
 model: sonnet
+skills:
+  - aiops-investigation
+  - mssql-operations
 ---
 
 # Incident Report Generator Agent

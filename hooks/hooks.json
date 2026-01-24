@@ -1,0 +1,44 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "mcp__mssql__get_disk_space",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Analyze the disk space results. If any drive shows >90% usage, immediately flag it as CRITICAL and highlight it prominently. If >80%, flag as WARNING. Summarize the drive health status."
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__mssql__get_blocking",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "If blocking chains are detected, identify the head blocker (root cause) and calculate the total number of blocked sessions. Recommend whether the head blocker should be killed based on wait time and impact."
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__prometheus__list_alerts",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Categorize the alerts by severity. Group FIRING alerts by affected system/instance. If there are multiple related alerts, identify if they might share a common root cause."
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "sql-instance-discovery",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Verify the discovery results: 1) Were instances found? 2) Was the architecture pattern detected (shared-disk vs independent)? 3) Were environments identified? If discovery returned zero instances, suggest troubleshooting steps."
+          }
+        ]
+      }
+    ]
+  }
+}
