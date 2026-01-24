@@ -1,6 +1,6 @@
 ---
 name: sql-instance-discovery
-description: Discovers all SQL Server instances dynamically from Prometheus targets. Use this agent BEFORE any database operations. Works with any Prometheus/SQL Server infrastructure.
+description: "Discovers all SQL Server instances dynamically from Prometheus targets. Use this agent BEFORE any database operations. Works with any Prometheus/SQL Server infrastructure. <example>Context: User wants to check database health.\\nuser: \"Check the health of our databases\"\\nassistant: \"First, I'll use the sql-instance-discovery agent to discover all SQL instances from Prometheus.\"</example>"
 tools: mcp__prometheus__list_targets, mcp__prometheus__get_target_health
 model: sonnet
 skills:

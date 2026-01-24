@@ -1,6 +1,6 @@
 ---
 name: quick-health
-description: Fast infrastructure health check. Use this for daily checks or quick status verification. Runs lightweight queries across all systems.
+description: This skill should be used for fast infrastructure health checks. It runs lightweight queries across Prometheus, SQL Server, and Azure DevOps to quickly assess infrastructure status. Use when performing daily checks, quick status verification, or when the user asks "is everything healthy?" or "quick check".
 user-invocable: true
 argument-hint: "[environment]"
 model: haiku

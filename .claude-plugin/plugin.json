@@ -1,6 +1,6 @@
 {
   "name": "infrastructure-plugin",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "AI-powered infrastructure observability for incident investigation across Prometheus, SQL Server, and Azure DevOps. Works with any company's infrastructure through dynamic discovery.",
   "author": {
     "name": "Nof Yonany",
@@ -21,6 +21,5 @@
     "observability",
     "mcp"
   ],
-  "hooks": "./hooks/hooks.json",
   "mcpServers": "./.mcp.json"
 }

@@ -1,6 +1,7 @@
 ---
 name: incident-report-generator
-description: Synthesizes findings from Prometheus, SQL Server, and Azure DevOps to generate comprehensive incident reports with root cause hypothesis and confidence scoring.
+description: "Synthesizes findings from Prometheus, SQL Server, and Azure DevOps to generate comprehensive incident reports with root cause hypothesis and confidence scoring. <example>Context: Investigation data has been collected from all systems.\\nuser: \"Generate the incident report with all findings\"\\nassistant: \"I'll use the incident-report-generator agent to synthesize all findings into a comprehensive report.\"</example>"
+tools: Read, Write
 model: sonnet
 skills:
   - aiops-investigation

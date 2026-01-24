@@ -1,6 +1,6 @@
 ---
 name: mssql-operations
-description: SQL Server operations knowledge for multi-instance environments. Provides instance discovery patterns, naming conventions, and operational best practices. Works with any SQL Server infrastructure.
+description: This skill should be used when working with SQL Server infrastructure. It provides operations knowledge for multi-instance environments, including instance discovery patterns, naming conventions, and operational best practices. Use when querying SQL Server, analyzing performance, or investigating database issues.
 user-invocable: false
 model: inherit
 ---
@@ -403,3 +403,10 @@ When checking many instances:
 Discovery results valid for ~5 minutes:
 - Can reuse discovered instance list
 - Don't need to re-discover for every operation in same investigation
+
+## Reference Files
+
+For detailed guidance, see:
+
+- [wait-types.md](./references/wait-types.md) - SQL Server wait type interpretation guide
+- [common-issues.md](./references/common-issues.md) - Quick reference for diagnosing common SQL issues

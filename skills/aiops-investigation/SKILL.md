@@ -1,7 +1,7 @@
 ---
 name: aiops-investigation
-description: Use this skill for production incident investigation. Provides investigation methodology, correlation techniques, and infrastructure knowledge for autonomous incident response.
-user-invocable: true
+description: This skill should be used for production incident investigation. It provides investigation methodology, correlation techniques, and infrastructure knowledge for autonomous incident response. Use when investigating infrastructure incidents, correlating events across systems, or when root cause analysis is needed.
+user-invocable: false
 model: inherit
 ---
 
@@ -208,3 +208,10 @@ This correlation is KEY to incident investigation.
 - Each server has independent resources
 - Query each server for complete picture
 - No shared-resource concerns
+
+## Reference Files
+
+For detailed guidance, see:
+
+- [incident-patterns.md](./references/incident-patterns.md) - Common incident patterns and investigation approaches
+- [correlation-techniques.md](./references/correlation-techniques.md) - Multi-system correlation methods

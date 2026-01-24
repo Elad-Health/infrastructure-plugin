@@ -1,6 +1,6 @@
 ---
 name: incident-investigation
-description: Full production incident investigation across Prometheus, SQL Server, and Azure DevOps. Use when users report issues, outages, or performance problems.
+description: This skill should be used for full production incident investigation across Prometheus, SQL Server, and Azure DevOps. It performs multi-system correlation and AI-powered analysis to identify root causes. Use when users report issues, outages, performance problems, or when investigating production incidents.
 user-invocable: true
 argument-hint: "[description of incident]"
 model: sonnet

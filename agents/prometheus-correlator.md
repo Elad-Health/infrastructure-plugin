@@ -1,6 +1,6 @@
 ---
 name: prometheus-correlator
-description: Analyzes Prometheus infrastructure metrics and correlates application server alerts with SQL Server instances. Creates unified timelines from infrastructure monitoring data.
+description: "Analyzes Prometheus infrastructure metrics and correlates application server alerts with SQL Server instances. Creates unified timelines from infrastructure monitoring data. <example>Context: Investigating a production incident.\\nuser: \"What alerts are firing and how do they relate to the database issues?\"\\nassistant: \"I'll use the prometheus-correlator agent to analyze alerts and create a correlation timeline.\"</example>"
 tools: mcp__prometheus__list_alerts, mcp__prometheus__get_alert_history, mcp__prometheus__query_instant, mcp__prometheus__query_range, mcp__prometheus__query_windows_exporter, mcp__prometheus__query_node_exporter
 model: sonnet
 skills:

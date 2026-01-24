@@ -1,6 +1,6 @@
 ---
 name: db-health
-description: Quick database health check across all SQL Server instances. Checks database states, identifies offline or suspect databases.
+description: This skill should be used for quick database health checks across SQL Server instances. It verifies database states and identifies offline, suspect, or recovering databases. Use when the user asks about database health, wants to check if databases are online, or needs a quick SQL Server status.
 user-invocable: true
 argument-hint: "[environment]"
 model: haiku
