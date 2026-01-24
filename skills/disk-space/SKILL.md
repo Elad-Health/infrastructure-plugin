@@ -3,7 +3,7 @@ name: disk-space
 description: This skill should be used for disk space analysis across SQL Server infrastructure. It uses architecture-aware optimization to minimize token usage while providing comprehensive drive analysis. Use when investigating disk space alerts, checking storage capacity, or when users ask about disk usage or "is disk full?".
 user-invocable: true
 argument-hint: "[instance|environment|threshold]"
-model: sonnet
+model: inherit
 skills:
   - mssql-operations
 ---

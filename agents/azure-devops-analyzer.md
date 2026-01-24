@@ -2,7 +2,7 @@
 name: azure-devops-analyzer
 description: "Analyzes Azure DevOps/TFS build and release history to correlate deployments with incidents. Identifies code changes and timing relationships with infrastructure issues. <example>Context: Investigating if a deployment caused the issue.\\nuser: \"Check if recent deployments caused this problem\"\\nassistant: \"I'll use the azure-devops-analyzer agent to analyze recent deployments and correlate with the incident.\"</example>"
 tools: mcp__azure-devops__list_builds, mcp__azure-devops__get_build, mcp__azure-devops__get_build_logs, mcp__azure-devops__list_releases, mcp__azure-devops__get_release, mcp__azure-devops__list_commits, mcp__azure-devops__get_commit, mcp__azure-devops__compare_branches
-model: sonnet
+model: inherit
 skills:
   - aiops-investigation
 ---

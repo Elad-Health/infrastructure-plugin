@@ -3,7 +3,7 @@ name: performance-analysis
 description: This skill should be used for deep performance analysis of SQL Server instances. It analyzes expensive queries, wait stats, blocking chains, and provides optimization recommendations. Use when investigating slow queries, performance degradation, or when the user asks "why is the database slow?".
 user-invocable: true
 argument-hint: "[instance|environment]"
-model: sonnet
+model: inherit
 skills:
   - mssql-operations
 ---

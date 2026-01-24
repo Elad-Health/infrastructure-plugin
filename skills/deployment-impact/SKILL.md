@@ -3,7 +3,7 @@ name: deployment-impact
 description: This skill should be used for analyzing recent deployments and their impact on infrastructure. It correlates Azure DevOps builds/releases with Prometheus alerts and SQL Server performance. Use when investigating post-deployment issues, checking if a deployment caused problems, or when the user asks "did the deployment break something?".
 user-invocable: true
 argument-hint: "[hours|build-number]"
-model: sonnet
+model: inherit
 skills:
   - aiops-investigation
 ---
