@@ -16,9 +16,9 @@ Comprehensive incident investigation using multi-system correlation and AI-power
 ## Usage
 
 ```
-/infrastructure-plugin:incident-investigation
-/infrastructure-plugin:incident-investigation Users reporting timeouts on production API
-/infrastructure-plugin:incident-investigation Application slow since last deployment
+/ops:incident-investigation
+/ops:incident-investigation Users reporting timeouts on production API
+/ops:incident-investigation Application slow since last deployment
 ```
 
 ## Arguments

@@ -5,6 +5,14 @@ All notable changes to the Infrastructure Plugin will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2026-02-18
+
+### Changed
+
+- **BREAKING:** Renamed plugin from `infrastructure-plugin` to `ops` for shorter command invocations
+  - All skills now use `/ops:` prefix (e.g., `/ops:quick-health` instead of `/infrastructure-plugin:quick-health`)
+  - Updated plugin.json, marketplace.json, all SKILL.md files, command files, README, and CLAUDE.md
+
 ## [1.0.6] - 2025-01-24
 
 ### Fixed

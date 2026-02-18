@@ -15,9 +15,9 @@ Quick health check of all SQL Server databases across your infrastructure.
 ## Usage
 
 ```
-/infrastructure-plugin:db-health
-/infrastructure-plugin:db-health production
-/infrastructure-plugin:db-health qa
+/ops:db-health
+/ops:db-health production
+/ops:db-health qa
 ```
 
 ## Arguments
@@ -122,5 +122,5 @@ Last checked: {timestamp}
 **Best For:** Daily health checks, quick status verification
 
 For deeper investigation, use:
-- `/infrastructure-plugin:incident-investigation` - Full incident analysis
-- `/infrastructure-plugin:performance-analysis` - Performance deep dive
+- `/ops:incident-investigation` - Full incident analysis
+- `/ops:performance-analysis` - Performance deep dive

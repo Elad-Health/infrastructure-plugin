@@ -13,8 +13,8 @@ Perform a fast infrastructure health check across Prometheus, SQL Server, and Az
 ## Usage
 
 ```
-/infrastructure-plugin:quick-health
-/infrastructure-plugin:quick-health production
+/ops:quick-health
+/ops:quick-health production
 ```
 
 ## What This Skill Does
@@ -135,4 +135,4 @@ Recommended Actions:
 **Token Usage:** ~5-15k tokens (lightweight queries)
 
 This is designed for quick daily checks, not deep investigation.
-For detailed analysis, use `/infrastructure-plugin:incident-investigation`.
+For detailed analysis, use `/ops:incident-investigation`.

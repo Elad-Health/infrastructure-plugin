@@ -14,6 +14,6 @@ This command runs lightweight queries to quickly assess:
 ## Usage
 
 ```
-/infrastructure-plugin:quick-health
-/infrastructure-plugin:quick-health production
+/ops:quick-health
+/ops:quick-health production
 ```

@@ -21,13 +21,13 @@ Works dynamically with **any company's infrastructure** through intelligent disc
 /plugin marketplace add https://github.com/elad-nofy/infrastructure-plugin.git
 
 # Install the plugin
-/plugin install infrastructure-plugin
+/plugin install ops
 ```
 
 ### Manual Installation
 
 ```bash
-git clone https://github.com/elad-nofy/infrastructure-plugin.git ~/.claude/plugins/infrastructure-plugin
+git clone https://github.com/elad-nofy/infrastructure-plugin.git ~/.claude/plugins/ops
 ```
 
 ### Configuration
@@ -84,48 +84,48 @@ Edit `.mcp.json` or add to `~/.claude/settings.json`:
 
 ### 1. Verify Installation
 ```
-/infrastructure-plugin:quick-health
+/ops:quick-health
 ```
 
 ### 2. Discover Your Infrastructure
 ```
-/infrastructure-plugin:sql-instance-discovery
+/ops:sql-instance-discovery
 ```
 
 ### 3. Investigate an Issue
 ```
-/infrastructure-plugin:incident-investigation Users reporting slow API response
+/ops:incident-investigation Users reporting slow API response
 ```
 
 ## Usage Examples
 
 ### Daily Health Check
 ```
-/infrastructure-plugin:quick-health
-/infrastructure-plugin:quick-health production
+/ops:quick-health
+/ops:quick-health production
 ```
 
 ### Check Disk Space
 ```
-/infrastructure-plugin:disk-space
-/infrastructure-plugin:disk-space >90%
+/ops:disk-space
+/ops:disk-space >90%
 ```
 
 ### Investigate Incident
 ```
-/infrastructure-plugin:incident-investigation
+/ops:incident-investigation
 API timeouts started after deployment
 ```
 
 ### Performance Analysis
 ```
-/infrastructure-plugin:performance-analysis production
+/ops:performance-analysis production
 ```
 
 ### Deployment Impact
 ```
-/infrastructure-plugin:deployment-impact 24h
-/infrastructure-plugin:deployment-impact build-1234
+/ops:deployment-impact 24h
+/ops:deployment-impact build-1234
 ```
 
 ## Architecture
@@ -226,7 +226,7 @@ The plugin discovers your infrastructure from Prometheus - no hardcoded values:
 
 ### Token limit exceeded
 - Architecture detection should prevent this
-- Try: `/infrastructure-plugin:disk-space production`
+- Try: `/ops:disk-space production`
 
 ## Safety
 

@@ -15,9 +15,9 @@ Deep performance investigation of SQL Server instances to identify bottlenecks a
 ## Usage
 
 ```
-/infrastructure-plugin:performance-analysis
-/infrastructure-plugin:performance-analysis production
-/infrastructure-plugin:performance-analysis SQLSERVER01\PROD_DB
+/ops:performance-analysis
+/ops:performance-analysis production
+/ops:performance-analysis SQLSERVER01\PROD_DB
 ```
 
 ## Arguments
@@ -170,4 +170,4 @@ Query: `KILL 152`
 **Single Instance:** ~30-50k tokens
 **Multiple Instances:** Scales linearly with instance count
 
-For quick checks, use `/infrastructure-plugin:db-health` instead.
+For quick checks, use `/ops:db-health` instead.

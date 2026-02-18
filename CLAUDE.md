@@ -17,7 +17,7 @@
 ## Directory Structure
 
 ```
-infrastructure-plugin/
+ops/
 ├── .claude-plugin/
 │   ├── plugin.json          # Plugin manifest
 │   └── marketplace.json     # GitHub auto-install config
@@ -113,6 +113,6 @@ Hooks are defined in `hooks/hooks.json` and auto-loaded by Claude Code.
 After changes, test with:
 
 ```bash
-/plugin reload infrastructure-plugin
-/infrastructure-plugin:quick-health
+/plugin reload ops
+/ops:quick-health
 ```

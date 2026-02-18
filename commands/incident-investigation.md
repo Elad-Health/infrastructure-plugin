@@ -15,7 +15,7 @@ This command performs multi-system correlation:
 ## Usage
 
 ```
-/infrastructure-plugin:incident-investigation
-/infrastructure-plugin:incident-investigation Users reporting timeouts on API
-/infrastructure-plugin:incident-investigation Application slow since deployment
+/ops:incident-investigation
+/ops:incident-investigation Users reporting timeouts on API
+/ops:incident-investigation Application slow since deployment
 ```

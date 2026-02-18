@@ -15,7 +15,7 @@ This command analyzes:
 ## Usage
 
 ```
-/infrastructure-plugin:performance-analysis
-/infrastructure-plugin:performance-analysis production
-/infrastructure-plugin:performance-analysis SQLSERVER01\PROD_DB
+/ops:performance-analysis
+/ops:performance-analysis production
+/ops:performance-analysis SQLSERVER01\PROD_DB
 ```

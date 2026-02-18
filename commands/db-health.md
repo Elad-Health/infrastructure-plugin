@@ -14,6 +14,6 @@ This command verifies database states and identifies:
 ## Usage
 
 ```
-/infrastructure-plugin:db-health
-/infrastructure-plugin:db-health production
+/ops:db-health
+/ops:db-health production
 ```

@@ -14,7 +14,7 @@ This command uses architecture-aware optimization:
 ## Usage
 
 ```
-/infrastructure-plugin:disk-space
-/infrastructure-plugin:disk-space production
-/infrastructure-plugin:disk-space >90%
+/ops:disk-space
+/ops:disk-space production
+/ops:disk-space >90%
 ```

@@ -15,9 +15,9 @@ Analyze recent deployments and correlate with infrastructure changes to identify
 ## Usage
 
 ```
-/infrastructure-plugin:deployment-impact
-/infrastructure-plugin:deployment-impact 24h
-/infrastructure-plugin:deployment-impact build-1234
+/ops:deployment-impact
+/ops:deployment-impact 24h
+/ops:deployment-impact build-1234
 ```
 
 ## Arguments

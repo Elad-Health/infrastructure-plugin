@@ -1,15 +1,15 @@
 {
   "$schema": "https://raw.githubusercontent.com/anthropics/claude-code/main/schemas/plugin-marketplace.schema.json",
-  "name": "infrastructure-plugin",
+  "name": "ops",
   "owner": {
     "name": "Nof Yonany",
     "url": "https://github.com/elad-nofy"
   },
   "plugins": [
     {
-      "name": "infrastructure-plugin",
+      "name": "ops",
       "source": "./",
-      "version": "1.0.6",
+      "version": "2.0.0",
       "description": "AI-powered infrastructure observability for incident investigation across Prometheus, SQL Server, and Azure DevOps"
     }
   ]

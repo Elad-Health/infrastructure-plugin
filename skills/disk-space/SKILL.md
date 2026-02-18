@@ -15,10 +15,10 @@ Comprehensive disk space analysis across all SQL Server instances with architect
 ## Usage
 
 ```
-/infrastructure-plugin:disk-space
-/infrastructure-plugin:disk-space production
-/infrastructure-plugin:disk-space >90%
-/infrastructure-plugin:disk-space SQLSERVER01\PROD_DB
+/ops:disk-space
+/ops:disk-space production
+/ops:disk-space >90%
+/ops:disk-space SQLSERVER01\PROD_DB
 ```
 
 ## Arguments
