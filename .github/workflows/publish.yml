@@ -1,0 +1,52 @@
+name: Publish MCP Server to npm
+
+on:
+  push:
+    tags:
+      - 'mssql-v*'
+      - 'prometheus-v*'
+      - 'azure-devops-v*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          registry-url: 'https://registry.npmjs.org/'
+          cache: 'npm'
+
+      - name: Ensure npm is recent
+        run: npm i -g npm@latest
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build all workspaces
+        run: npm run build
+
+      - name: Determine workspace and version from tag
+        id: meta
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          # Extract workspace name (everything before -v)
+          WORKSPACE=$(echo "$TAG" | sed 's/-v[0-9].*//')
+          # Extract version (everything after the workspace prefix and -v)
+          VERSION=$(echo "$TAG" | sed "s/^${WORKSPACE}-v//")
+          echo "workspace=$WORKSPACE" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Publishing $WORKSPACE@$VERSION"
+
+      - name: Set package version
+        run: npm version ${{ steps.meta.outputs.version }} --no-git-tag-version -w mcp-servers/${{ steps.meta.outputs.workspace }}
+
+      - name: Publish to npm (OIDC)
+        run: npm publish --provenance --access public -w mcp-servers/${{ steps.meta.outputs.workspace }}

@@ -1,0 +1,17 @@
+{
+  "name": "infrastructure-plugin",
+  "private": true,
+  "version": "2.0.0",
+  "description": "AI-powered infrastructure observability plugin for Claude Code",
+  "workspaces": [
+    "mcp-servers/mssql",
+    "mcp-servers/prometheus",
+    "mcp-servers/azure-devops"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "build:mssql": "npm run build -w mcp-servers/mssql",
+    "build:prometheus": "npm run build -w mcp-servers/prometheus",
+    "build:azure-devops": "npm run build -w mcp-servers/azure-devops"
+  }
+}
