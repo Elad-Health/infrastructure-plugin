@@ -1,36 +1,37 @@
 {
   "mcpServers": {
     "azure-devops": {
-    "command": "cmd",
-    "args": ["/c", "npx", "-y", "azure-devops-mcp@latest"],
-    "env": {
-      "AZURE_DEVOPS_URL": "${AZURE_DEVOPS_URL}",
-      "AZURE_DEVOPS_PAT": "${AZURE_DEVOPS_PAT}",
-      "AZURE_DEVOPS_COLLECTION": "${AZURE_DEVOPS_COLLECTION}",
-      "AZURE_DEVOPS_PROJECT": "${AZURE_DEVOPS_PROJECT}"
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "azure-devops-mcp@latest"],
+      "env": {
+        "AZURE_DEVOPS_URL": "${AZURE_DEVOPS_URL}",
+        "AZURE_DEVOPS_PAT": "${AZURE_DEVOPS_PAT}",
+        "AZURE_DEVOPS_COLLECTION": "${AZURE_DEVOPS_COLLECTION}",
+        "AZURE_DEVOPS_PROJECT": "${AZURE_DEVOPS_PROJECT}"
+      }
+    },
+    "prometheus": {
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@elad-nofy/prometheus-mcp@latest"],
+      "env": {
+        "PROMETHEUS_URL": "${PROMETHEUS_URL}",
+        "PROMETHEUS_USERNAME": "${PROMETHEUS_USERNAME}",
+        "PROMETHEUS_PASSWORD": "${PROMETHEUS_PASSWORD}"
+      }
+    },
+    "mssql": {
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@elad-nofy/mssql-mcp@latest"],
+      "env": {
+        "MSSQL_HOST": "${MSSQL_HOST}",
+        "MSSQL_PORT": "${MSSQL_PORT}",
+        "MSSQL_AUTH": "${MSSQL_AUTH}",
+        "MSSQL_USER": "${MSSQL_USER}",
+        "MSSQL_PASSWORD": "${MSSQL_PASSWORD}",
+        "MSSQL_DATABASE": "${MSSQL_DATABASE}",
+        "MSSQL_ENCRYPT": "${MSSQL_ENCRYPT}",
+        "MSSQL_TRUST_SERVER_CERTIFICATE": "${MSSQL_TRUST_SERVER_CERTIFICATE}"
+      }
     }
-  },
-  "prometheus": {
-    "command": "cmd",
-    "args": ["/c", "npx", "-y", "@elad-nofy/prometheus-mcp@latest"],
-    "env": {
-      "PROMETHEUS_URL": "${PROMETHEUS_URL}",
-      "PROMETHEUS_USERNAME": "${PROMETHEUS_USERNAME}",
-      "PROMETHEUS_PASSWORD": "${PROMETHEUS_PASSWORD}"
-    }
-  },
-  "mssql": {
-    "command": "cmd",
-    "args": ["/c", "npx", "-y", "@elad-nofy/mssql-mcp@latest"],
-    "env": {
-      "MSSQL_HOST": "${MSSQL_HOST}",
-      "MSSQL_PORT": "${MSSQL_PORT}",
-      "MSSQL_USER": "${MSSQL_USER}",
-      "MSSQL_PASSWORD": "${MSSQL_PASSWORD}",
-      "MSSQL_DATABASE": "${MSSQL_DATABASE}",
-      "MSSQL_ENCRYPT": "${MSSQL_ENCRYPT}",
-      "MSSQL_TRUST_SERVER_CERTIFICATE": "${MSSQL_TRUST_SERVER_CERTIFICATE}"
-    }
-  }
   }
 }

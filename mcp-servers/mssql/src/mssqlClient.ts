@@ -4,9 +4,34 @@ import { Config } from './config.js';
 export class MssqlClient {
   private pools: Map<string, sql.ConnectionPool> = new Map();
   private config: Config;
+  // For Windows Integrated auth we need the msnodesqlv8 driver instead of the
+  // default tedious driver (tedious cannot do trusted connections). Loaded
+  // lazily so SQL-auth users never pull in the native dependency.
+  private driver: typeof sql | null = null;
 
   constructor(config: Config) {
     this.config = config;
+  }
+
+  private async getDriver(): Promise<typeof sql> {
+    if (this.config.authType !== 'windows') {
+      return sql;
+    }
+    if (!this.driver) {
+      try {
+        // mssql ships a separate entry point bound to the msnodesqlv8 driver.
+        const mod = await import('mssql/msnodesqlv8.js');
+        this.driver = (mod.default ?? mod) as typeof sql;
+      } catch (error) {
+        throw new Error(
+          'Windows Integrated authentication requires the "msnodesqlv8" driver ' +
+            'and a Microsoft ODBC Driver for SQL Server, which are only available ' +
+            'on Windows. Original error: ' +
+            (error instanceof Error ? error.message : String(error))
+        );
+      }
+    }
+    return this.driver;
   }
 
   private async connect(server: string): Promise<sql.ConnectionPool> {
@@ -33,24 +58,32 @@ export class MssqlClient {
       port = parseInt(portStr, 10);
     }
 
+    const isWindowsAuth = this.config.authType === 'windows';
+
     const config: sql.config = {
       server: serverHost,
       database: this.config.database,
-      user: this.config.user,
-      password: this.config.password,
       options: {
         trustServerCertificate: this.config.trustServerCertificate,
         instanceName,
+        // Connect as the logged-in Windows account (no credentials).
+        ...(isWindowsAuth ? { trustedConnection: true } : {}),
       },
       connectionTimeout: this.config.connectionTimeout,
       requestTimeout: this.config.requestTimeout,
     };
 
+    if (!isWindowsAuth) {
+      config.user = this.config.user;
+      config.password = this.config.password;
+    }
+
     if (!instanceName) {
       config.port = port;
     }
 
-    const pool = new sql.ConnectionPool(config);
+    const driver = await this.getDriver();
+    const pool = new driver.ConnectionPool(config);
     await pool.connect();
     this.pools.set(key, pool);
     return pool;
@@ -109,12 +142,13 @@ export class MssqlClient {
       };
     }
 
-    // Check if credentials are configured
-    if (!this.config.user || !this.config.password) {
+    // Check if credentials are configured (only for SQL authentication;
+    // Windows Integrated auth uses the logged-in account instead).
+    if (this.config.authType !== 'windows' && (!this.config.user || !this.config.password)) {
       return {
         success: false,
         server: targetServer,
-        error: `SQL Authentication required. Set MSSQL_USER and MSSQL_PASSWORD environment variables.`
+        error: `SQL Authentication required. Set MSSQL_USER and MSSQL_PASSWORD environment variables, or set MSSQL_AUTH=windows to use Windows Integrated authentication.`
       };
     }
 
