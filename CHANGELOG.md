@@ -5,16 +5,6 @@ All notable changes to the Infrastructure Plugin will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.1.0] - 2026-06-25
-
-### Added
-
-- **mssql:** Windows Integrated authentication support (connects as the logged-in Windows account)
-  - Set `MSSQL_AUTH=windows` to authenticate without a username/password
-  - Uses the optional native `msnodesqlv8` driver + Microsoft ODBC Driver for SQL Server (Windows only)
-  - SQL authentication (`MSSQL_USER`/`MSSQL_PASSWORD`) remains the default
-  - Exposed `MSSQL_AUTH` in `.mcp.json`
-
 ## [2.0.0] - 2026-02-18
 
 ### Changed
